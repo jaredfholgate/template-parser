@@ -3,7 +3,7 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
-    tags: [ "*" ]
+  create:
   pull_request:
     branches: [ "main" ]
 
