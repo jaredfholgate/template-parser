@@ -80,7 +80,12 @@ namespace Template.Parser.Core
 
         public JToken ProcessTemplate(string parameters, InsensitiveDictionary<JToken> metadataDictionary)
         {
-            var definedParameters = PopulateParameters(parameters);
+            InsensitiveDictionary<JToken> definedParameters = new InsensitiveDictionary<JToken>();
+            if(!string.IsNullOrEmpty(parameters))
+            {
+                definedParameters = PopulateParameters(parameters);
+            }
+            
             var generatedParameters = PopulateParameters(PlaceholderInputGenerator.GeneratePlaceholderParameters(armTemplate));
 
             definedParameters.AddRangeIfNotExists(generatedParameters);
