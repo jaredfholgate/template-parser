@@ -36,16 +36,16 @@ namespace Template.Parser.Cli.UnitTests
         }
 
         [TestMethod]
-        public void CanUseParametersInCLi()
+        public void CanUseDefaultsAndParametersInCLi()
         {
             var tempateFilePath = Path.Combine(AssemblyPath, "exampleTemplates", "exampleTemplate03.json");
             var templateFile = $"-s {tempateFilePath}";
-            //var parameters = "-p location=${default_location} -p properties.scope=${current_scope_resource_id}";
+            var parameters = "-p logAnalyticsResourceId=/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/${root_scope_id}-mgmt/providers/Microsoft.OperationalInsights/workspaces/${root_scope_id}-la";
 
             var stringWriter = new StringWriter();
             Console.SetOut(stringWriter);
 
-            Template.Parser.Cli.Program.Main(new string[] { templateFile }).Wait();
+            Template.Parser.Cli.Program.Main(new string[] { templateFile, parameters }).Wait();
 
 
             var output = stringWriter.ToString();
@@ -65,7 +65,7 @@ namespace Template.Parser.Cli.UnitTests
     ""enforcementMode"": ""Default"",
     ""parameters"": {
       ""logAnalytics_1"": {
-        ""value"": ""defaultString1""
+        ""value"": ""/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/${root_scope_id}-mgmt/providers/Microsoft.OperationalInsights/workspaces/${root_scope_id}-la""
       }
     }
   }

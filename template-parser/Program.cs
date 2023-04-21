@@ -82,7 +82,7 @@ namespace Template.Parser.Cli
 
             foreach (var parameter in parameters)
             {
-                var split = parameter.Split('=');
+                var split = parameter.Trim().Split('=');
                 jsonParameters[split[0]] = new JObject(new JProperty("value", split[1]));
             }
 
