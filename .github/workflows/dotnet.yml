@@ -1,9 +1,9 @@
 name: .NET
 
 on:
+  create:
   push:
     branches: [ "main" ]
-  create:
   pull_request:
     branches: [ "main" ]
 
