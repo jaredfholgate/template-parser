@@ -81,26 +81,36 @@ namespace Template.Parser.Core
         public JToken ProcessTemplate(string parameters, InsensitiveDictionary<JToken> metadataDictionary)
         {
             InsensitiveDictionary<JToken> definedParameters = new InsensitiveDictionary<JToken>();
-            if(!string.IsNullOrEmpty(parameters))
+            if (!string.IsNullOrEmpty(parameters))
             {
                 definedParameters = PopulateParameters(parameters);
             }
-            
+
             var generatedParameters = PopulateParameters(PlaceholderInputGenerator.GeneratePlaceholderParameters(armTemplate));
 
-            foreach(var parameter in definedParameters.Keys)
-            {
-                if(!generatedParameters.ContainsKey(parameter))
-                {
-                    definedParameters.Remove(parameter);
-                }
-            }
+            RemoveUnusedParameters(definedParameters);
 
             definedParameters.AddRangeIfNotExists(generatedParameters);
 
             var template = ParseAndValidateTemplate(definedParameters, metadataDictionary);
 
             return template.ToJToken();
+        }
+
+        private void RemoveUnusedParameters(InsensitiveDictionary<JToken> definedParameters)
+        {
+            var jsonTemplate = JObject.Parse(armTemplate);
+
+            var templateParameters = jsonTemplate.InsensitiveToken("parameters").Children<JProperty>().Select(o => o.Name).ToHashSet();
+
+            foreach (var parameter in definedParameters.Keys)
+            {
+                var test = string.Empty;
+                if (!templateParameters.TryGetValue(parameter, out test))
+                {
+                    definedParameters.Remove(parameter);
+                }
+            }
         }
 
         /// <summary>
