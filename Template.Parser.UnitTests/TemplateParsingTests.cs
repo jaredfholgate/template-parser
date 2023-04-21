@@ -126,5 +126,12 @@ namespace Template.Parser.UnitTests
             Debug.Write(resultJson);
             Assert.AreEqual(expectedResult, resultJson);
         }
+
+        [TestMethod]
+        public void CanGenerateMetaData()
+        {
+            var metaData = PlaceholderInputGenerator.GeneratePlaceholderDeploymentMetadata("${default_location}");
+
+        }
     }
 }

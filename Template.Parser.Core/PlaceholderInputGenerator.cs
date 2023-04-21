@@ -7,7 +7,7 @@ namespace Template.Parser.Core
     /// <summary>
     /// Generates placeholder values for required inputs to process templates
     /// </summary>
-    internal static class PlaceholderInputGenerator
+    public static class PlaceholderInputGenerator
     {
         /// <summary>
         /// Generates placeholder parameters when no default value is specified in the ARM Template.
@@ -95,24 +95,27 @@ namespace Template.Parser.Core
         /// Use this if you do not rely on the deployment metadata.
         /// </summary>
         /// <returns>A dictionary with mock metadata.</returns>
-        internal static InsensitiveDictionary<JToken> GeneratePlaceholderDeploymentMetadata()
+        public static InsensitiveDictionary<JToken> GeneratePlaceholderDeploymentMetadata(string location = "westus2")
         {
-            var deployment = JObject.Parse(@"
+            var deployment = JObject.FromObject(new
             {
-                ""name"": ""placeholderDeploymentName"",
-                ""type"": ""placeholderDeploymentType"",
-                ""location"": ""westus2"",
-                ""id"": ""/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/placeholderResourceGroup"",
-                ""properties"": {
-                    ""templateLink"": {
-                        ""uri"": ""https://deploymenturi"",
-                        ""contentVersion"": ""0.0"",
-                        ""metadata"": {
-                            ""metadata"": ""placeholderDeploymentMetadata""
+                name = "placeholderDeploymentName",
+                type = "placeholderDeploymentType",
+                location = location,
+                id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/placeholderResourceGroup",
+                properties = new
+                {
+                    templateLink = new
+                    {
+                        uri = "https://deploymenturi",
+                        contentVersion = "0.0",
+                        metadata = new
+                        {
+                            metadata = "placeholderDeploymentMetadata"
                         }
                     }
                 }
-            }");
+            });
 
             var providers = new JArray
             {

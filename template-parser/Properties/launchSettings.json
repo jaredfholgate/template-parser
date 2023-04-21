@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Template.Parser.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\Users\\jaredholgate\\Code\\Enterprise-Scale\\eslzArm\\managementGroupTemplates\\policyAssignments\\DENY-AksPrivEscalationPolicyAssignment.json"
+    }
+  }
+}

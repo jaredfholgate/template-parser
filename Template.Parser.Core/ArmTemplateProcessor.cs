@@ -53,7 +53,7 @@ namespace Template.Parser.Core
         /// <returns>The processed template as a <c>JSON</c> object.</returns>
         public JToken ProcessTemplate()
         {
-            return ProcessTemplate(null, null);
+            return ProcessTemplate("", "");
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Template.Parser.Core
         /// <returns>The processed template as a <c>JSON</c> object.</returns>
         public JToken ProcessTemplate(string parameters)
         {
-            return ProcessTemplate(parameters, null);
+            return ProcessTemplate(parameters, "");
         }
 
         /// <summary>
@@ -74,8 +74,13 @@ namespace Template.Parser.Core
         /// <returns>The processed template as a <c>JSON</c> object.</returns>
         public JToken ProcessTemplate(string parameters, string metadata)
         {
-            InsensitiveDictionary<JToken> parametersDictionary = PopulateParameters(string.IsNullOrEmpty(parameters) ? PlaceholderInputGenerator.GeneratePlaceholderParameters(armTemplate) : parameters);
             InsensitiveDictionary<JToken> metadataDictionary = string.IsNullOrEmpty(metadata) ? PlaceholderInputGenerator.GeneratePlaceholderDeploymentMetadata() : PopulateDeploymentMetadata(metadata);
+            return ProcessTemplate(parameters, metadataDictionary);
+        }
+
+        public JToken ProcessTemplate(string parameters, InsensitiveDictionary<JToken> metadataDictionary)
+        {
+            InsensitiveDictionary<JToken> parametersDictionary = PopulateParameters(string.IsNullOrEmpty(parameters) ? PlaceholderInputGenerator.GeneratePlaceholderParameters(armTemplate) : parameters);
 
             var template = ParseAndValidateTemplate(parametersDictionary, metadataDictionary);
 
@@ -163,8 +168,6 @@ namespace Template.Parser.Core
             {
                 ProcessTemplateResourceLanguageExpressions(resourceInfo.resource, evaluationHelper);
 
-                //CopyResourceDependants(resourceInfo.resource);
-
                 if (!ResourceMappings.ContainsKey(resourceInfo.resource.Path))
                 {
                     AddResourceMapping(resourceInfo.expandedPath, resourceInfo.resource.Path);
@@ -197,91 +200,6 @@ namespace Template.Parser.Core
             }
 
             return template;
-        }
-
-        /// <summary>
-        /// Copies child resources into sub resources for parent resources.
-        /// </summary>
-        /// <param name="templateResource">The child resource.</param>
-        internal void CopyResourceDependants(TemplateResource templateResource)
-        {
-            if (templateResource.DependsOn == null)
-            {
-                return;
-            }
-
-            foreach (var parentResourceIds in templateResource.DependsOn)
-            {
-                string parentResourceName;
-                (TemplateResource resource, string expandedPath) parentResourceInfo = (null, null);
-                // If the dependsOn references the resourceId
-                if (parentResourceIds.Value.StartsWith("/subscriptions"))
-                {
-                    string parentResourceType;
-                    string parentResourceId = IResourceIdentifiableExtensions.GetUnqualifiedResourceId(parentResourceIds.Value);
-                    if (parentResourceId != "")
-                    {
-                        parentResourceName = IResourceIdentifiableExtensions.GetResourceName(parentResourceId);
-                        parentResourceType = IResourceIdentifiableExtensions.GetFullyQualifiedResourceType(parentResourceId);
-                    }
-                    else
-                    {
-                        // When there's no provider segment, GetUnqualifiedResourceId returns an empty string
-                        // and GetFullyQualifiedResourceId returns invalid values.
-                        // If the parent resource is defined as "/subscriptions/<anID>/resourceGroups/<aName>",
-                        // or the TemplateEngine reduces it to that shape (for example if the parent resource is specified as subscriptionResourceId('Microsoft.Resources/resourceGroups', <aName>)),
-                        // then there won't be any provider segment:
-                        parentResourceType = "Microsoft.Resources/resourceGroups";
-                        parentResourceName = IResourceIdentifiableExtensions.GetResourceGroup(parentResourceIds.Value);
-
-                        if (parentResourceName == null)
-                        {
-                            throw new Exception("Resource group name was not found on parent resource id: " + parentResourceIds.Value);
-                        }
-                    }
-
-                    this.flattenedResources.TryGetValue($"{parentResourceName} {parentResourceType}", out parentResourceInfo);
-                }
-                // If the dependsOn references the resource name
-                else
-                {
-                    parentResourceName = parentResourceIds.Value;
-                    var matchingResources = this.flattenedResources.Where(k => k.Key.StartsWith($"{parentResourceName} ", StringComparison.OrdinalIgnoreCase)).ToList();
-                    if (matchingResources.Count == 1)
-                    {
-                        parentResourceInfo = matchingResources.First().Value;
-                    }
-                }
-
-                // Parent resouce is not in the template
-                if (parentResourceInfo == (null, null))
-                {
-                    continue;
-                }
-
-                // Add this resource as a child of its parent resource
-                var parentResource = parentResourceInfo.resource;
-                var parentResourceExpandedPath = parentResourceInfo.expandedPath;
-                if (parentResource.Resources == null)
-                {
-                    parentResource.Resources = new TemplateResource[] { templateResource };
-
-                    AddResourceMapping($"{parentResourceExpandedPath}.resources[0]", templateResource.Path);
-                }
-                // check if resource is already a child of parent resource
-                else if (!parentResource.Resources.Any(res =>
-                    res.Name.Value == templateResource.Name.Value &&
-                    res.Type.Value == templateResource.Type.Value))
-                {
-                    var childResources = parentResource.Resources;
-                    parentResource.Resources = childResources.ConcatArray(new TemplateResource[] { templateResource });
-                    int resourceIndex = parentResource.Resources.Length - 1;
-
-                    AddResourceMapping($"{parentResourceExpandedPath}.resources[{resourceIndex}]", templateResource.Path);
-                }
-            }
-
-            return;
         }
 
         private void AddResourceMapping(string expandedTemplatePath, string originalTemplatePath)
