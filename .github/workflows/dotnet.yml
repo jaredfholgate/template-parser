@@ -33,7 +33,7 @@ jobs:
       working-directory: template-parser
       
     - name: Publish Windows
-      run: dotnet publish --no-restore --no-build -r win-x64 -c Release
+      run: dotnet publish -r win-x64 -c Release
       
     - name: Release
       uses: softprops/action-gh-release@v1
