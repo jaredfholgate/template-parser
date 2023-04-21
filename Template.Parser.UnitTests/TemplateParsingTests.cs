@@ -56,7 +56,7 @@ namespace Template.Parser.UnitTests
   }
 }";
             Debug.Write(resultJson);
-            Assert.AreEqual(expectedResult, resultJson);
+            Assert.AreEqual(expectedResult.Replace("\r\n", "\n"), resultJson.Replace("\r\n", "\n"));
 
         }
 
@@ -88,7 +88,7 @@ namespace Template.Parser.UnitTests
   }
 }";
             Debug.Write(resultJson);
-            Assert.AreEqual(expectedResult, resultJson);
+            Assert.AreEqual(expectedResult.Replace("\r\n", "\n"), resultJson.Replace("\r\n", "\n"));
 
         }
 
@@ -124,7 +124,7 @@ namespace Template.Parser.UnitTests
   }
 }";
             Debug.Write(resultJson);
-            Assert.AreEqual(expectedResult, resultJson);
+            Assert.AreEqual(expectedResult.Replace("\r\n", "\n"), resultJson.Replace("\r\n", "\n"));
         }
 
         [TestMethod]

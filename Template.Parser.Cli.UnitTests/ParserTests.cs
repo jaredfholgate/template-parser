@@ -31,7 +31,7 @@ namespace Template.Parser.Cli.UnitTests
       ""value"": ""${current_scope_resource_id}""
     }
   }
-}", parsedParameters);
+}".Replace("\r\n", "\n"), parsedParameters.Replace("\r\n", "\n"));
 
         }
 
@@ -69,7 +69,7 @@ namespace Template.Parser.Cli.UnitTests
       }
     }
   }
-}", output);
+}".Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
         }
 
         [TestMethod]
@@ -82,7 +82,6 @@ namespace Template.Parser.Cli.UnitTests
             Console.SetOut(stringWriter);
 
             Template.Parser.Cli.Program.Main(new string[] { templateFile }).Wait();
-
 
             var output = stringWriter.ToString();
             Assert.AreEqual(@"{
@@ -105,7 +104,7 @@ namespace Template.Parser.Cli.UnitTests
       }
     }
   }
-}", output);
+}".Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
         }
     }
 }
