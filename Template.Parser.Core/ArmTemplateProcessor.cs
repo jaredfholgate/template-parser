@@ -88,6 +88,14 @@ namespace Template.Parser.Core
             
             var generatedParameters = PopulateParameters(PlaceholderInputGenerator.GeneratePlaceholderParameters(armTemplate));
 
+            foreach(var parameter in definedParameters.Keys)
+            {
+                if(!generatedParameters.ContainsKey(parameter))
+                {
+                    definedParameters.Remove(parameter);
+                }
+            }
+
             definedParameters.AddRangeIfNotExists(generatedParameters);
 
             var template = ParseAndValidateTemplate(definedParameters, metadataDictionary);
