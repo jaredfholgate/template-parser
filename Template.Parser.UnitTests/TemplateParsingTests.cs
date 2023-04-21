@@ -30,7 +30,7 @@ namespace Template.Parser.UnitTests
         }
 
         [TestMethod]
-        public void CanParseAndConvertToJsonString()
+        public void CanParseAndConvertToJsonStringWithNonComplianceMessage()
         {
             var templateJson = File.ReadAllText($"{AssemblyPath}/exampleTemplates/exampleTemplate01.json");
             var templateParser = new ArmTemplateProcessor(templateJson);
@@ -48,6 +48,11 @@ namespace Template.Parser.UnitTests
     ""displayName"": ""Web Application Firewall (WAF) should be enabled for Application Gateway"",
     ""policyDefinitionId"": ""/providers/Microsoft.Authorization/policyDefinitions/564feb30-bf6a-4854-b4bb-0d2d2d1e6c66"",
     ""enforcementMode"": ""Default"",
+    ""nonComplianceMessages"": [
+      {
+        ""message"": ""Web Application Firewall (WAF) must be enabled for Application Gateway.""
+      }
+    ],
     ""parameters"": {
       ""effect"": {
         ""value"": ""Audit""
