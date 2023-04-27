@@ -27,6 +27,7 @@
   </ItemGroup>
 	
   <ItemGroup>
+	<None Remove="exampleTemplates\exampleTemplate01.json" />
     <None Remove="exampleTemplates\exampleTemplate02.json" />
     <None Remove="exampleTemplates\exampleTemplate03.json" />
   </ItemGroup>

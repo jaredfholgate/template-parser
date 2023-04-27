@@ -5,6 +5,7 @@ using Template.Parser.Core;
 using Newtonsoft.Json.Linq;
 using System.Dynamic;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 
 namespace Template.Parser.Cli
 {
@@ -29,24 +30,33 @@ namespace Template.Parser.Cli
             parametersOption.AddAlias("-p");
             rootCommand.AddOption(parametersOption);
 
+            var parametersFilePathOption = new Option<string>("--parameterFilePath", "A parameter file location.")
+            {
+                Arity = ArgumentArity.ZeroOrOne
+            };
+            parametersFilePathOption.AddAlias("-f");
+            rootCommand.AddOption(parametersFilePathOption);
+
             var locationOption = new Option<string>("--location", "The default location value for the template.")
             {
                 Arity = ArgumentArity.ZeroOrOne
             };
-            parametersOption.AddAlias("-l");
+            locationOption.AddAlias("-l");
+            rootCommand.AddOption(locationOption);
 
-            rootCommand.SetHandler((sourceTemplate, parameters, location) =>
+            rootCommand.SetHandler((sourceTemplate, parameters, parametersFilePath, location) =>
             {
-                RunParser(sourceTemplate.Trim(), parameters, location);
+                RunParser(sourceTemplate.Trim(), parameters, parametersFilePath, location);
             },
             sourceTemplateOption, 
             parametersOption,
+            parametersFilePathOption,
             locationOption);
 
             await rootCommand.InvokeAsync(args);
         }
 
-        static void RunParser(string sourceTemplate, List<string> parameters, string location)
+        static void RunParser(string sourceTemplate, List<string> parameters, string parameterFilePath, string location)
         {            
             if(string.IsNullOrEmpty(location))
             {
@@ -61,14 +71,23 @@ namespace Template.Parser.Cli
             Debug.WriteLine($"Parsing {sourceTemplate}");
             var parser = new ArmTemplateProcessor(template);
             JToken result = null;
-            if(parameters.Count > 0)
+
+            if (!string.IsNullOrEmpty(parameterFilePath))
             {
-                var parametersJson = BuildParameters(parameters);
-                result = parser.ProcessTemplate(parametersJson, defaults);
+                var parametersFile = File.ReadAllText(parameterFilePath.Trim());
+                result = parser.ProcessTemplate(parametersFile, defaults);
             }
             else
             {
-                result = parser.ProcessTemplate(string.Empty, defaults);
+                if (parameters.Count > 0)
+                {
+                    var parametersJson = BuildParameters(parameters);
+                    result = parser.ProcessTemplate(parametersJson, defaults);
+                }
+                else
+                {
+                    result = parser.ProcessTemplate(string.Empty, defaults);
+                }
             }
 
             Debug.WriteLine($"Serialising {sourceTemplate}");

@@ -184,5 +184,45 @@ namespace Template.Parser.Cli.UnitTests
   }
 }".Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
         }
+
+        [TestMethod]
+        public void CanUseParametersFile()
+        {
+            var tempateFilePath = Path.Combine(AssemblyPath, "exampleTemplates", "exampleTemplate04.json");
+            var parametersFilePath = Path.Combine(AssemblyPath, "exampleTemplates", "exampleTemplate04Params.json");
+            var templateFile = $"-s {tempateFilePath}";
+            var parametersFile = $"-f {parametersFilePath}";
+
+
+            var stringWriter = new StringWriter();
+            Console.SetOut(stringWriter);
+
+            Template.Parser.Cli.Program.Main(new string[] { templateFile, parametersFile }).Wait();
+
+
+            var output = stringWriter.ToString();
+            Assert.AreEqual(@"{
+  ""type"": ""Microsoft.Authorization/policyAssignments"",
+  ""apiVersion"": ""2019-09-01"",
+  ""name"": ""Audit-AppGW-WAF"",
+  ""dependsOn"": [],
+  ""properties"": {
+    ""description"": ""ThisIsAStringFromAFile"",
+    ""displayName"": 12345,
+    ""policyDefinitionId"": ""/providers/Microsoft.Authorization/policyDefinitions/564feb30-bf6a-4854-b4bb-0d2d2d1e6c66"",
+    ""enforcementMode"": ""Default"",
+    ""nonComplianceMessages"": [
+      {
+        ""message"": ""Web Application Firewall (WAF) must be enabled for Application Gateway.""
+      }
+    ],
+    ""parameters"": {
+      ""effect"": {
+        ""value"": ""Audit""
+      }
+    }
+  }
+}".Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
+        }
     }
 }
