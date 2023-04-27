@@ -330,7 +330,7 @@ namespace Template.Parser.Core
                     InsensitiveHashSet evaluationsToSkip = new InsensitiveHashSet();
                     if (templateResource.Type.Value.Equals("Microsoft.Resources/deployments", StringComparison.OrdinalIgnoreCase))
                     {
-                        evaluationsToSkip.Add("template");  // The tool should skip properties in nested templates to avoid false positive warnings
+                        //evaluationsToSkip.Add("template");  // The tool should skip properties in nested templates to avoid false positive warnings
                     }
 
                     templateResource.Properties.Value = ExpressionsEngine.EvaluateLanguageExpressionsRecursive(
