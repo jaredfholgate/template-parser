@@ -299,7 +299,7 @@ namespace Template.Parser.Core
                         resource.Path = $"resources[{i}]";
                     }
 
-                    dictionaryKey = $"{resource.Name.Value} {resource.Type.Value}";
+                    dictionaryKey = $"{resource.Name.Value} {resource.Type.Value} {resource.LineNumber}";
                 }
 
                 var resourceExpandedPath = $"{(parentExpandedPath != "" ? parentExpandedPath + "." : "")}resources[{i}]";

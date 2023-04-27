@@ -15,6 +15,8 @@
     <None Remove="exampleTemplates\exampleTemplate03.json" />
     <None Remove="exampleTemplates\exampleTemplate04.json" />
 	<None Remove="exampleTemplates\exampleTemplate04Params.json" />
+	<None Remove="exampleTemplates\eslzArm.json" />
+	<None Remove="exampleTemplates\eslzArm.test.param.json" />
   </ItemGroup>
 
 	<ItemGroup>

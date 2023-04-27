@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Newtonsoft.Json;
 using System.Reflection;
 using System.Xml.Linq;
 
@@ -223,6 +224,28 @@ namespace Template.Parser.Cli.UnitTests
     }
   }
 }".Replace("\r\n", "\n"), output.Replace("\r\n", "\n"));
+        }
+
+        [TestMethod]
+        public void CanUseParseEslzFile()
+        {
+            var tempateFilePath = Path.Combine(AssemblyPath, "exampleTemplates", "eslzArm.json");
+            var parametersFilePath = Path.Combine(AssemblyPath, "exampleTemplates", "eslzArm.test.param.json");
+            var templateFile = $"-s {tempateFilePath}";
+            var parametersFile = $"-f {parametersFilePath}";
+
+
+            var stringWriter = new StringWriter();
+            Console.SetOut(stringWriter);
+
+            Template.Parser.Cli.Program.Main(new string[] { templateFile, parametersFile, "-a" }).Wait();
+
+
+            var output = stringWriter.ToString();
+
+            var check = JsonConvert.DeserializeObject<List<dynamic>>(output);
+
+            Assert.AreEqual(248, check.Count);
         }
     }
 }

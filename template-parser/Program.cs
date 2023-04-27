@@ -44,19 +44,27 @@ namespace Template.Parser.Cli
             locationOption.AddAlias("-l");
             rootCommand.AddOption(locationOption);
 
-            rootCommand.SetHandler((sourceTemplate, parameters, parametersFilePath, location) =>
+            var returnAllOption = new Option<bool>("--all", "Whether to return all the resources. By default it will just return the first resource.")
             {
-                RunParser(sourceTemplate.Trim(), parameters, parametersFilePath, location);
+                Arity = ArgumentArity.ZeroOrOne
+            };
+            returnAllOption.AddAlias("-a");
+            rootCommand.AddOption(returnAllOption);
+
+            rootCommand.SetHandler((sourceTemplate, parameters, parametersFilePath, location, returnAll) =>
+            {
+                RunParser(sourceTemplate.Trim(), parameters, parametersFilePath, location, returnAll);
             },
             sourceTemplateOption, 
             parametersOption,
             parametersFilePathOption,
-            locationOption);
+            locationOption,
+            returnAllOption);
 
             await rootCommand.InvokeAsync(args);
         }
 
-        static void RunParser(string sourceTemplate, List<string> parameters, string parameterFilePath, string location)
+        static void RunParser(string sourceTemplate, List<string> parameters, string parameterFilePath, string location, bool returnAll)
         {            
             if(string.IsNullOrEmpty(location))
             {
@@ -91,7 +99,7 @@ namespace Template.Parser.Cli
             }
 
             Debug.WriteLine($"Serialising {sourceTemplate}");
-            var json = JsonConvert.SerializeObject(result.SelectToken("resources")[0], Formatting.Indented);
+            var json = JsonConvert.SerializeObject(returnAll ? result.SelectToken("resources") : result.SelectToken("resources")[0], Formatting.Indented);
             Console.Write(json);
         }
 
