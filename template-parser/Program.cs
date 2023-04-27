@@ -83,7 +83,25 @@ namespace Template.Parser.Cli
             foreach (var parameter in parameters)
             {
                 var split = parameter.Trim().Split('=');
-                jsonParameters[split[0]] = new JObject(new JProperty("value", split[1]));
+                var value = split[1];
+                if (value.StartsWith("[[["))
+                {
+                    var typeValueSplit = value.Split(new string[] { "[[[", "]]]" }, StringSplitOptions.RemoveEmptyEntries);
+                    switch (typeValueSplit[0])
+                    {
+                        case "Int64":
+                            jsonParameters[split[0]] = new JObject(new JProperty("value", Int64.Parse(typeValueSplit[1])));
+                            break;
+
+                        default:
+                            jsonParameters[split[0]] = new JObject(new JProperty("value", typeValueSplit[1]));
+                            break;
+                    }
+                }
+                else
+                {
+                    jsonParameters[split[0]] = new JObject(new JProperty("value", split[1]));
+                }
             }
 
             return JObject.FromObject(new { parameters = jsonParameters }).ToString();
